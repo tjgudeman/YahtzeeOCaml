@@ -1,0 +1,162 @@
+(* Name: TJ Gudeman
+* Date 2/22/2017
+* Project: Yahtzee score analyzer. Given 5 dice results, give the Yahtzee result and score
+* Tested using: https://ocsigen.org/js_of_ocaml/2.7/files/toplevel/index.html
+*)
+
+
+(*  Define Sort me  *)
+let sortMe ls = List.sort compare ls;;
+
+(* Check isYahtzee *)
+      let isYahtzee newList =
+      if List.length (List.sort_uniq compare newList) = 1
+      then true
+      else false
+
+
+(* Check isTwoKind *)
+      let isTwoKind newList =
+        let rec isTwoKindHelper x newList =
+          if newList = []
+            then false
+          else if x = List.hd newList
+            then true
+          else isTwoKindHelper (List.hd newList) (List.tl newList)
+        in isTwoKindHelper (List.hd newList) (List.tl newList)
+
+(* Check isLargeStraight *)
+    let isLargeStraight newList =
+      if (List.nth newList 0 > 2 )
+      then false
+      else
+        let rec isLargeStraightHelper x newList =
+          if newList = []
+            then true
+          else if x+1 = List.hd newList
+           then isLargeStraightHelper (List.hd newList) (List.tl newList)
+           else false
+      in isLargeStraightHelper (List.hd newList)(List.tl newList);;
+
+(* Check isSmallStraight 4 in a row *)
+    let isSmallStraight newList =
+      if (List.nth newList 0 > 3)
+        then false
+    else
+      let rec isSmallStraightHelper head count newList =
+        if count = 4
+          then true
+          else if newList = []
+            then false
+            else if head+1 = List.hd newList
+              then isSmallStraightHelper (List.hd newList) (count + 1) (List.tl newList)
+              else isSmallStraightHelper (List.hd newList) 1 (List.tl newList)
+          in isSmallStraightHelper (List.hd newList) 1 (List.tl (List.sort_uniq compare newList))
+
+
+(* Check Three and Four of a Kind *)
+let is_X_Kind x newList =
+    let rec isThreeKindHelper h count newList =
+      if count = x
+        then true
+        else if newList = []
+          then false
+            else if h = (List.hd newList)
+              then isThreeKindHelper (List.hd newList) (count+1) (List.tl newList)
+              else isThreeKindHelper (List.hd newList) 1 (List.tl newList)
+  in isThreeKindHelper (List.hd newList) 1 (List.tl newList);;
+
+
+
+(* Full House *)
+let isFullHouse newList =
+  if is_X_Kind 4 newList
+    then false
+    else if isTwoKind newList
+      then if List.length (List.sort_uniq compare newList) = 2
+        then true
+    else false
+else false
+
+
+
+(* Add up List *)
+let addUp newList =
+  let rec addUpHelper total newList =
+    if newList = []
+      then total
+      else addUpHelper (total + (List.hd newList)) (List.tl newList)
+  in addUpHelper 0 newList
+
+
+  (* Main function; Runs through logic *)
+  let yahtzeeLogic newList =
+  if isYahtzee(newList)
+    then let myAnswer = ("Yahtzee ",  50) in myAnswer
+    else if isLargeStraight (newList)
+      then let myAnswer = ("Large Straight ", 40) in myAnswer
+      else if isSmallStraight(newList)
+        then let myAnswer = ("Small Straight ",   30) in myAnswer
+        else if isFullHouse (newList)
+          then if is_X_Kind 3 (newList)
+            then if addUp(newList) > 25
+              then let myAnswer = ("3 of kind ", addUp(newList)) in myAnswer
+              else let myAnswer = ("Full house ", 25) in myAnswer
+          else let myAnswer = ("Full house ",  25) in myAnswer
+            else if is_X_Kind 4 (newList)
+              then let myAnswer = ("Four of Kind", addUp(newList)) in myAnswer
+              else if is_X_Kind 3 (newList)
+                then let myAnswer = ("Three kind", addUp(newList)) in myAnswer
+                else let myAnswer = ("Chance", addUp(newList)) in myAnswer
+
+
+(* Primer  1 *)
+type myAnswer = string * int
+
+(* Primer 2 *)
+let yahtzee originalList =
+  yahtzeeLogic(sortMe(originalList))
+
+(* For testing purposes *)
+yahtzee [4; 4; 4; 4; 4];; (* Yaht  *)
+yahtzee [2; 3; 4; 5; 6];;  (* Large Str  *)
+yahtzee [5; 4; 2; 3; 6];;  (* Large Str  *)
+yahtzee [1; 2; 4; 2; 3];; (* Small str  *)
+yahtzee [2; 1; 2; 1; 2];; (* Full House  *)
+yahtzee [6; 6; 6; 5; 5];; (* Full House that is 3 of kind  =2 8 *)
+yahtzee [2; 2; 2; 2; 6];; (* 4 kind  = 14*)
+yahtzee [2; 2; 2; 4; 6];; (* 3 kind  = 16 *)
+yahtzee [1; 4; 4; 5; 6];; (* Chance  = 20 *)
+
+
+
+
+
+
+
+
+
+
+
+
+    (* Main function; Runs through logic *)
+    let yahtzeeLogic newList =
+    if isYahtzee(newList)
+      then let myAnswer = ("Yahtzee ",  50) in myAnswer
+      else let myAnswer = ("Nazi ",  5) in myAnswer
+        then Printf.printf("Large Straight:  40pts")
+        else if isSmallStraight(newList)
+          then Printf.printf("Small Straight:   30pts")
+          else if isFullHouse (newList)
+
+            then if is_X_Kind 3 (newList)
+              then if addUp(newList) > 25
+                then Printf.printf("3 of kind (not full)")
+                else Printf.printf("Full house:  25pts")
+            else Printf.printf("Full house:  25pts")
+
+              else if is_X_Kind 4 (newList)
+                then Printf.printf("Four of Kind")
+                else if is_X_Kind 3 (newList)
+                  then Printf.printf("Three kind")
+                  else Printf.printf("None")
