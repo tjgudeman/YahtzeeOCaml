@@ -133,30 +133,3 @@ yahtzee [1; 4; 4; 5; 6];; (* Chance  = 20 *)
 
 
 
-
-
-
-
-
-
-    (* Main function; Runs through logic *)
-    let yahtzeeLogic newList =
-    if isYahtzee(newList)
-      then let myAnswer = ("Yahtzee ",  50) in myAnswer
-      else let myAnswer = ("Nazi ",  5) in myAnswer
-        then Printf.printf("Large Straight:  40pts")
-        else if isSmallStraight(newList)
-          then Printf.printf("Small Straight:   30pts")
-          else if isFullHouse (newList)
-
-            then if is_X_Kind 3 (newList)
-              then if addUp(newList) > 25
-                then Printf.printf("3 of kind (not full)")
-                else Printf.printf("Full house:  25pts")
-            else Printf.printf("Full house:  25pts")
-
-              else if is_X_Kind 4 (newList)
-                then Printf.printf("Four of Kind")
-                else if is_X_Kind 3 (newList)
-                  then Printf.printf("Three kind")
-                  else Printf.printf("None")
